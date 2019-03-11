@@ -173,10 +173,10 @@ class Multi_Acc_Metric(mx.metric.EvalMetric):
                 self.sum_metric += (pred_label.flat == label.flat).sum()
                 self.num_inst += len(pred_label.flat)
             else:
-                if 0 <= i <= 3:
+                if 0 <= i <= 5:
                     self.sum_metric[i] += (pred_label.flat == label.flat).sum()
                     self.num_inst[i] += len(pred_label.flat)
-                if i==4 or i == 5 or i == 6 or i==7 or i==8:
+                if i==9 or i == 10 or i == 6 or i==7 or i==8:
                     self.sum_metric[i] += (pred_label.flat == label.flat).sum()
                     temp = len(pred_label.flat)
                     for item in label:
@@ -426,13 +426,13 @@ def fit(args, network, data_loader, **kwargs):
     model = mx.mod.Module(
         context       = devs,
         symbol        = network,
-        label_names   = {'gender_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrella_label','shoes_label'}
+        label_names   = {'gender_label','hat_label','umbrella_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrellacolor_label','shoes_label'}
     )
     model_mix = mx.mod.Module(
         context       = devs,
         symbol        = network,
-        label_names   = {'gender_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrella_label','shoes_label',
-                         'gender_mix_label','bag_mix_label','handbag_mix_label','backpack_mix_label','updress_mix_label','downdress_mix_label','hatcolor_mix_label','umbrella_mix_label','shoes_mix_label'}
+        label_names   = {'gender_label','hat_label','umbrella_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrellacolor_label','shoes_label',
+                         'gender_mix_label','hat_mix_label','umbrella_mix_label','bag_mix_label','handbag_mix_label','backpack_mix_label','updress_mix_label','downdress_mix_label','hatcolor_mix_label','umbrellacolor_mix_label','shoes_mix_label'}
     )
 
     lr_scheduler  = lr_scheduler
@@ -500,7 +500,7 @@ def fit(args, network, data_loader, **kwargs):
     if args.top_k > 0:
         eval_metrics.append(mx.metric.create('top_k_accuracy', top_k=args.top_k))
         
-    eval_metrics = Multi_Acc_Metric(num=9,label_names= ['gender_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrella_label','shoes_label'])
+    eval_metrics = Multi_Acc_Metric(num=11,label_names= ['gender_label','hat_label','umbrella_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrellacolor_label','shoes_label'])
 
     supported_loss = ['ce', 'nll_loss']
     if len(args.loss) > 0:

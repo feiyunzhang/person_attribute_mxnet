@@ -19,6 +19,7 @@ import mxnet as mx
 import random
 from mxnet.io import DataBatch, DataIter
 import numpy as np
+import config
 
 def add_data_args(parser):
     data = parser.add_argument_group('Data', 'the input images')
@@ -203,7 +204,7 @@ def get_rec_iter(args, kv=None):
 class MultiIter:
     def __init__(self, iter_list,summary_writer= None):
         self.iters = iter_list
-        self.label_list = ['gender_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrella_label','shoes_label']
+        self.label_list = ['gender_label','hat_label','umbrella_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrellacolor_label','shoes_label']
         self.split_label = None
         self.summary_writer = summary_writer
     def next(self):
@@ -249,15 +250,19 @@ class MultiIter:
 class MultiIter_Mixup:
     def __init__(self, iter_list,summary_writer= None):
         self.iters = iter_list
-        self.label_list_origin = ['gender_label','bag_label','handbag_label','backpack_label',
-                                  'updress_label','downdress_label','hatcolor_label','umbrella_label','shoes_label']
-        self.label_list = ['gender_label','bag_label','handbag_label','backpack_label','updress_label',
-                           'downdress_label','hatcolor_label','umbrella_label','shoes_label',
-                           'gender_mix_label','bag_mix_label','handbag_mix_label',
+        self.label_list_origin =['gender_label','hat_label','umbrella_label','bag_label','handbag_label','backpack_label',
+                                'updress_label','downdress_label','hatcolor_label','umbrellacolor_label','shoes_label']
+        self.label_list = ['gender_label','hat_label','umbrella_label','bag_label','handbag_label',
+                           'backpack_label','updress_label','downdress_label',
+                           'hatcolor_label','umbrellacolor_label','shoes_label',
+                           'gender_mix_label','hat_mix_label','umbrella_mix_label','bag_mix_label','handbag_mix_label',
                             'backpack_mix_label','updress_mix_label','downdress_mix_label',
-                           'hatcolor_mix_label','umbrella_mix_label','shoes_mix_label']
+                           'hatcolor_mix_label','umbrellacolor_mix_label','shoes_mix_label']
         self.split_label = None
         self.summary_writer = summary_writer
+
+
+
     def next(self):
         batches = self.iters.next()
         #for idx,label in enumerate(self.label_list):
@@ -270,7 +275,9 @@ class MultiIter_Mixup:
         #for split in split_label:
         index  = np.random.permutation(batch_size)
 
-        lam = 0.8
+
+        lam =config.set_lam_value()
+
         mixed_x = batches.data[0] * lam+ (1.0 - lam) * batches.data[0][index, :]
         batches.data[0] = mixed_x
 
@@ -326,7 +333,7 @@ def get_rec_iter_mutil(args, kv=None):
     train = mx.io.ImageRecordIter(
         path_imgrec         = args.data_train,
         path_imgidx         = args.data_train_idx,
-        label_width         = 9,
+        label_width         = 11,
         mean_r              = rgb_mean[0],
         mean_g              = rgb_mean[1],
         mean_b              = rgb_mean[2],
@@ -334,7 +341,7 @@ def get_rec_iter_mutil(args, kv=None):
         std_g               = rgb_std[1],
         std_b               = rgb_std[2],
         data_name           = 'data',
-        label_name          = ['gender_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrella_label','shoes_label'],
+        label_name          = ['gender_label','hat_label','umbrella_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrellacolor_label','shoes_label'],
         data_shape          = image_shape,
         batch_size          = args.batch_size,
         rand_crop           = args.random_crop,
@@ -378,7 +385,7 @@ def get_rec_iter_mutil(args, kv=None):
     val = mx.io.ImageRecordIter(
         path_imgrec         = args.data_val,
         path_imgidx         = args.data_val_idx,
-        label_width         = 9,
+        label_width         = 11,
         mean_r              = rgb_mean[0],
         mean_g              = rgb_mean[1],
         mean_b              = rgb_mean[2],
@@ -386,7 +393,7 @@ def get_rec_iter_mutil(args, kv=None):
         std_g               = rgb_std[1],
         std_b               = rgb_std[2],
         data_name           = 'data',
-        label_name          = ['gender_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrella_label','shoes_label'],
+        label_name          = ['gender_label','hat_label','umbrella_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrellacolor_label','shoes_label'],
         batch_size          = args.batch_size,
         data_shape          = image_shape,
         preprocess_threads  = args.data_nthreads,
@@ -417,7 +424,7 @@ def get_rec_iter_mutil_mixup(args, kv=None):
     train = mx.io.ImageRecordIter(
         path_imgrec         = args.data_train,
         path_imgidx         = args.data_train_idx,
-        label_width         = 9,
+        label_width         = 11,
         mean_r              = rgb_mean[0],
         mean_g              = rgb_mean[1],
         mean_b              = rgb_mean[2],
@@ -425,7 +432,7 @@ def get_rec_iter_mutil_mixup(args, kv=None):
         std_g               = rgb_std[1],
         std_b               = rgb_std[2],
         data_name           = 'data',
-        label_name          = ['gender_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrella_label','shoes_label'],
+        label_name          = ['gender_label','hat_label','umbrella_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrellacolor_label','shoes_label'],
         data_shape          = image_shape,
         batch_size          = args.batch_size,
         rand_crop           = args.random_crop,
@@ -469,7 +476,7 @@ def get_rec_iter_mutil_mixup(args, kv=None):
     val = mx.io.ImageRecordIter(
         path_imgrec         = args.data_val,
         path_imgidx         = args.data_val_idx,
-        label_width         = 9,
+        label_width         = 11,
         mean_r              = rgb_mean[0],
         mean_g              = rgb_mean[1],
         mean_b              = rgb_mean[2],
@@ -477,7 +484,7 @@ def get_rec_iter_mutil_mixup(args, kv=None):
         std_g               = rgb_std[1],
         std_b               = rgb_std[2],
         data_name           = 'data',
-        label_name          = ['gender_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrella_label','shoes_label'],
+        label_name          = ['gender_label','hat_label','umbrella_label','bag_label','handbag_label','backpack_label','updress_label','downdress_label','hatcolor_label','umbrellacolor_label','shoes_label'],
         batch_size          = args.batch_size,
         data_shape          = image_shape,
         preprocess_threads  = args.data_nthreads,

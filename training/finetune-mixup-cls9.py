@@ -22,7 +22,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG)
 from common import find_mxnet
 from common import data, fit, modelzoo
-
+from common import  config
 import mxnet as mx
 
 def feature_transform(net,num_hidden = 256, drop_out_rate=0.5):
@@ -50,7 +50,8 @@ def get_fine_tune_model(symbol, arg_params, num_classes, layer_name):
     num_hidden = 1024
     drop_out_rate = 0.5
     net_gender_split = net
-    lam = 0.8
+    lam =config.get_lam_value()
+    print("lam",lam)
     # # net = mx.symbol.Convolution(net_gender_split, kernel=(1, 1), stride=(1, 1), num_filter=num_hidden * 2)
     # # net = mx.symbol.BatchNorm(data=net, use_global_stats=False, fix_gamma=False, eps=1e-5)
     # # net = mx.symbol.Activation(net, act_type='relu')
